@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your homepage</title>
+</head>
+<body>
+
+<div class="add-project">
+    <label for="create-project">Create project:</label>
+    <button id="create-project">Create</button>
+</div>
+
+<!--
+Later add a checkbox to make it a group research project.
+Let's actually hold off on that until the group features are more mature.
+-->
+<div class="project-creation" style="display: none">
+    <h3>Create a new research project</h3>
+    <label for="project-title">Title this project</label> <br>
+    <input type="text" id="project-title" required> <br>
+    <label for="project-goal">What is your mission statement/goal for this project?</label> <br>
+    <textarea id="project-goal" rows="4" cols="50" required></textarea> <br>
+    <label for="project-submit">Create project</label> <br>
+    <input type="submit" id="project-submit">
+</div>
+
+<div class="display-projects">
+    <h3>Your Projects:</h3>
+    <div class="no-projects" style="display: block">
+        <p>You don't have any projects to display. Start by creating one.</p>
+    </div>
+    <ul id="project-list">
+        <!--
+        Populated with JavaScript
+        -->
+    </ul>
+</div>
+
+</body>
+<script src="../javascripts/user_homepage_controller.js"></script>
+</html>
+
