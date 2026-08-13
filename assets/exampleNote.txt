@@ -1,0 +1,12 @@
+content:
+
+Many of David Heinemeier Hansson (DHH)s Demos,
+despite explaining different products,
+such as Rails, Turbo, Hotwire, or Stimulus,
+still face the same primitive problem:
+he demonstrates products exactly how you would expect from a person who wrote
+the entire system from scratch and has been programming for 20+ years;
+he tells you what something does, but not how or why.
+
+Title:
+omakase

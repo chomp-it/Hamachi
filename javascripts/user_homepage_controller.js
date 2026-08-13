@@ -1,5 +1,5 @@
 const createProjectButton = document.getElementById('create-project');
-const submitProjectFieldsButton = document.getElementById('submit-project-fields');
+const submitProjectFieldsButton = document.getElementById('project-submit');
 
 let canSubmit = false;
 
@@ -32,11 +32,15 @@ function verifyGivenData(givenData) {
 const organizeCreationData = (givenData) => { return JSON.stringify(givenData) }
 
 function createProject(withData) {
-    // replace this with the real logic once the backend is fully set up:
-
-    // this part is actually universal:
+    let thisProjectName = `${withData.title}_creation_data`;
     localStorage.setItem('current_project', withData.title);
-    localStorage.setItem(`${withData.title}_creation_data`, withData);
+
+    const organizedData = organizeCreationData(withData);
+
+    localStorage.setItem(thisProjectName, organizedData);
+
+    console.log('deposited data in localStorage:')
+    console.log(organizedData);
 
     window.location.href = '../views/research_project.html';
 }
@@ -59,9 +63,18 @@ submitProjectFieldsButton.addEventListener('click', () => {
         createProject(allCreationData);
     }
 
+    const hasSpecialCharacters = (title) => {return /[a-zA-Z]/.test(title)}
+
+    if (hasSpecialCharacters(allCreationData.title)) {
+        alert('Your project title contains special characters; please remove them.');
+        return;
+    }
+
     const projectCreatorElement = document.querySelector('.project-creation');
     projectCreatorElement.style.display = 'none';
 
     canSubmit = false;
+
+    console.log('created project');
 });
 

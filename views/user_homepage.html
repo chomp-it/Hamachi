@@ -17,12 +17,20 @@ Let's actually hold off on that until the group features are more mature.
 -->
 <div class="project-creation" style="display: none">
     <h3>Create a new research project</h3>
+
     <label for="project-title">Title this project</label> <br>
     <input type="text" id="project-title" required> <br>
-    <label for="project-goal">What is your mission statement/goal for this project?</label> <br>
+
+    <label for="project-goal">
+        What is your mission statement/goal for this project? <br>
+        Try to make it one sentence.
+    </label> <br>
     <textarea id="project-goal" rows="4" cols="50" required></textarea> <br>
+
     <label for="project-submit">Create project</label> <br>
-    <input type="submit" id="project-submit">
+    <input type="submit" id="project-submit"> <br>
+
+    <button id="project-creation-cancel">Cancel</button>
 </div>
 
 <div class="display-projects">

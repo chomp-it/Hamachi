@@ -14,6 +14,9 @@ async function displayMessage(message){
     loadingScreenElement[0].style.display = 'none';
 }
 
+// I've realized that referring to the short writings as both realizations and notes has been extremely painful--
+// it has caused many errors.
+
 function addContent(type, title, body) {
     console.log('triggered add content event');
 
@@ -67,9 +70,14 @@ function saveNoteToProject(note, title) {
         content: note,
         belongs_to: document.getElementById('project-title').textContent
     });
-    console.log('saved note to project');
 
     addContent('note', title, note);
+
+    // remove the "you haven't made any realizations yet" message
+    const noNotesElement = document.getElementById('no-realizations');
+    noNotesElement.style.display = 'none';
+
+    console.log('saved note to project');
 }
 
 function saveAxiomToProject(axiom, title) {
@@ -82,6 +90,11 @@ function saveAxiomToProject(axiom, title) {
     console.log('saved axiom to project');
 
     addContent('axiom', title, axiom);
+
+    // remove the "you haven't made any realizations yet" message
+    const noAxiomsElement = document.getElementById('no-axioms');
+    noAxiomsElement.style.display = 'none';
+
     console.log('saved axiom to project')
 }
 
@@ -113,7 +126,7 @@ noteEditorSubmitElement.addEventListener('click', () => {
     saveNoteToProject(
         document.getElementById('note-editor-interface').value,
         document.getElementById('note-editor-title').value
-    )
+    );
 
     document.getElementById('realization-editor').style.display = 'none';
 
@@ -133,12 +146,22 @@ noteEditorCancelElement.addEventListener('click', () => {
     clearNoteEditor();
 });
 
+function populateLinkDropDown() {
+    const linkDropDownElement = document.getElementById('link-dropdown');
+    const linksAvailable = document.querySelectorAll('#axioms-list li');
+    linksAvailable.forEach(link => {
+        linkDropDownElement.innerHTML += `<option value="${link.textContent}">${link.textContent}</option>`;
+    });
+    console.log('populated link dropdown');
+}
+
 // listener for the 'Develop an idea' button
 developIdeaElement.addEventListener('click', () => {
     console.log('develop idea button clicked');
     const axiomEditorElement = document.getElementById('axiom-editor');
     axiomEditorElement.style.display = 'block';
     ableToSubmit = true;
+    populateLinkDropDown();
     console.log('displayed axiom editor');
 });
 
@@ -201,7 +224,25 @@ const populateWithData = (projectData) => {
     projectTitleElement.textContent = projectData.title;
 }
 
-const currentProject = localStorage.getItem('current_project');
-const currentProjectData = JSON.parse(localStorage.getItem(`${currentProject}_creation_data`));
+// get the current project name
+let currentProjectName = '';
+try {
+    currentProjectName = localStorage.getItem('current_project');
+    if (currentProjectName === null) {
+        console.log('no current project found');
+    }
+} catch (error) {
+    console.log('failed to locate the current_project field in localStorage');
+}
+
+// get the data using the current project name
+let currentProjectData = '';
+try {
+    const thisProjectData = `${currentProjectName}_creation_data`;
+    currentProjectData = localStorage.getItem(thisProjectData);
+    currentProjectData = JSON.parse(currentProjectData);
+} catch (error) {
+    console.log('Failed to get the current project data.');
+}
 
 populateWithData(currentProjectData);
