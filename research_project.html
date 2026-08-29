@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your research project</title>
+
+    <link rel="favicon" type="image/svg+xml" href="../assets/hamachi_favicon.svg">
+    <link rel="stylesheet" href="../stylesheets/research_project.css">
+</head>
+<body>
+
+<a href="user_homepage.html">Back to your projects page</a>
+
+<div class="project-title">
+    <h2 id="project-title">No project title found</h2>
+</div>
+
+<div class="mission-statement">
+    <h4>Your goal for this project:</h4>
+    <p id="mission-statement">Failed to load the goal</p>
+    <hr>
+</div>
+
+<div class="realizations">
+    <h4>Your realizations:</h4>
+    <p id="no-realizations" style="display: block">You haven't made any realizations yet</p>
+    <ul id="realizations-list" style="list-style-type: none;">
+        <!--Populated with JavaScript-->
+    </ul>
+    <hr>
+</div>
+
+<div class="axioms">
+    <h4>Your axioms:</h4>
+    <p id="no-axioms" style="display: block">No axioms have been written yet</p>
+    <ul id="axioms-list" style="list-style-type: none;">
+        <!--Populated with JavaScript-->
+    </ul>
+    <hr>
+</div>
+
+<!--
+I'm not a designer; I'm a programmer. I'm not going to design a loading spinner
+-->
+<div class="loading-screen" style="display: block;">
+    <p id="loading-screen-message" style="color: #038c03"></p>
+</div>
+
+<div class="editors">
+    <div id="realization-editor" style="display: none">
+        <label for="note-editor-interface">What's on your mind?</label> <br>
+        <textarea id="note-editor-interface" rows="4" cols="50" required></textarea> <br>
+
+        <label for="note-editor-title">Title this thought</label> <br>
+        <input type="text" id="note-editor-title" required> <br>
+
+        <label for="note-editor-submit">Add realization to project</label> <br>
+        <input type="submit" id="note-editor-submit"> <br>
+
+        <button id="note-editor-cancel">Cancel</button> <br>
+    </div>
+
+    <div id="axiom-editor" style="display: none">
+        <label for="axiom-editor-title">Title this writing:</label> <br>
+        <input type="text" id="axiom-editor-title" required> <br>
+
+        <!--Change the input for the optional note link to a dropdown-->
+        <label for="select-note-link">Optionally link a realization to this axiom</label> <br>
+        <select id="select-note-link">
+            <!--Dropdowns are generated via JavaScript-->
+        </select> <br>
+
+        <label for="axiom-editor-interface">Let's explore this idea.</label> <br>
+        <textarea id="axiom-editor-interface" rows="4" cols="75" required></textarea> <br>
+
+        <label for="axiom-editor-submit">Add axiom to project</label> <br>
+        <input type="submit" id="axiom-editor-submit"> <br>
+
+        <button id="axiom-editor-cancel">Cancel</button> <br>
+    </div>
+</div>
+
+<div class="options">
+    <button id="jot-note">Jot down a note</button>
+    <button id="develop-idea">Develop an idea</button>
+    <button id="load-data">Load data</button>
+</div>
+
+<div id="publish-findings-menu" style="display: none">
+    <p>How do you wanna go about this?</p>
+</div>
+
+<div id="more-options-menu" style="display: none">
+
+</div>
+
+<script src="../javascripts/research_project_controller.js"></script>
+</body>
+
+</html>
