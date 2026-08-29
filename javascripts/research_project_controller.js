@@ -43,28 +43,32 @@ async function displayMessage(message){
     loadingScreenElement[0].style.display = 'none';
 }
 
-function addContent(type, title, body) {
+function addContent(type, title, body, time) {
     console.log('triggered add content event');
 
     if (body === "") {
-        alert('Broh. Your note is lacking a body. Kinda important, hombre.');
+        alert('Yeli, your note is lacking a body. Kinda important, hombre.');
         return;
     }
 
     if (title === "") {
-        alert('Your note is missing a title, chief. You need that.');
+        alert('Your note is missing a title, broidi. You need that.');
         return;
+    }
+
+    if (time == null) {
+        console.log('time is null');
     }
 
     if (type === 'note') {
         // refactor tämä
         notesListElement.innerHTML += `
         <li>
-        <h3>${title}</h3> <br>
+        <h3>${title} – added at ${time}</h3> <br>
         <p>${body}</p> <br>
         </li>
         `;
-        projectData.notes.push({title: title, body: body});
+        projectData.notes.push({title: title, body: body, time: time});
         console.log('added a note');
     } else if (type === 'axiom') {
         // refactor tämä
@@ -82,9 +86,12 @@ function addContent(type, title, body) {
     console.log(message);
 }
 
-// create a JSON object ja send it to the database
 function saveNoteToProject(note, title) {
-    addContent('note', title, note);
+    const date = new Date();
+    const minutes = date.getMinutes();
+    const hours = date.getHours();
+    const time = `${hours}:${minutes}`;
+    addContent('note', title, note, time);
 
     // remove the "You haven't made any realizations yet" message
     noNotesElement.style.display = 'none';
@@ -217,15 +224,21 @@ function restoreAxiomsAndNotes() {
     }
 
     projectContent.notes.forEach(piece => {
-        addContent('note', piece.title, piece.body);
+        addContent('note', piece.title, piece.body, piece.time);
     });
     projectContent.axioms.forEach(piece => {
-        addContent('axiom', piece.title, piece.body);
-    })
+        addContent('axiom', piece.title, piece.body, piece.time);
+    });
 }
 
 // restore the mission statement and project title data
 function populateWithData(projectData) {
+
+    if (projectData == null) {
+        console.log('no project data found');
+        return;
+    }
+
     missionStatementElement.textContent = projectData.goal;
 
     projectTitleElement.textContent = projectData.title;
@@ -233,28 +246,7 @@ function populateWithData(projectData) {
     restoreAxiomsAndNotes();
 }
 
-// get the current project name
-let currentProjectName = '';
-
-try {
-    currentProjectName = localStorage.getItem('current_project');
-    if (currentProjectName === null) {
-        console.log('no current project found');
-    }
-} catch (error) {
-    console.log('failed to locate the current_project field in localStorage');
-}
-
-// get the data using the current project name
-let currentProjectData = '';
-
-try {
-    const thisProjectData = `${currentProjectName}_creation_data`;
-    currentProjectData = localStorage.getItem(thisProjectData);
-    currentProjectData = JSON.parse(currentProjectData);
-} catch (error) {
-    console.log('Failed to get the current project data.');
-}
+const currentProjectData = loadData();
 
 populateWithData(currentProjectData);
 
