@@ -78,3 +78,30 @@ submitProjectFieldsButton.addEventListener('click', () => {
     console.log('created project');
 });
 
+
+
+// populating homepage with projects
+function populateProjectsList() {
+    const projectsListElement = document.getElementById('projects-list');
+    const globalJson = localStorage.getItem('current_project');
+    if (globalJson === null) {
+        console.log('Failed to locate the current_project file in localStorage.');
+        return;
+    }
+
+    let parsedJson = JSON.parse(globalJson);
+    let projectsList = parsedJson.projects;
+    if (projectsList !== null && projectsList !== undefined) {
+        const noProjectsElement = document.getElementById('no-projects');
+        noProjectsElement.style.display = 'none';
+    }
+
+    projectsList.forEach(project => {
+        projectsListElement.innerHTML += `
+   <li>
+   <p>Project name: ${project.name}</p>
+   <p>Project goal: ${project.goal}</p>
+   </li>`;
+    });
+}
+

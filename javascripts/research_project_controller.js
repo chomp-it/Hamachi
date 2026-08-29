@@ -1,21 +1,47 @@
-const addNoteElement = document.getElementById('jot-note');
-const developIdeaElement = document.getElementById('develop-idea');
-const publishFindingsElement = document.getElementById('publish-findings');
-const moreOptionsElement = document.getElementById('more-options');
-
-let ableToSubmit = false;
+const addNoteElement                  = document.getElementById('jot-note');
+const developIdeaElement              = document.getElementById('develop-idea');
+const publishFindingsElement          = document.getElementById('publish-findings');
+const moreOptionsElement              = document.getElementById('more-options');
+const saveDataElement                 = document.getElementById('save-project');
+const loadDataElement                 = document.getElementById('load-data');
 
 const loadingScreenElement = document.getElementsByClassName('loading-screen');
-const loadingScreenMessageElement = document.getElementById('loading-screen-message');
+const loadingScreenMessageElement     = document.getElementById('loading-screen-message');
+
+const notesListElement                = document.getElementById('realizations-list');
+const axiomsListElement               = document.getElementById('axioms-list');
+const noNotesElement                  = document.getElementById('no-realizations');
+const noAxiomsElement                 = document.getElementById('no-axioms');
+
+const noteEditorElement               = document.getElementById('realization-editor');
+const noteEditorSubmitElement         = document.getElementById('note-editor-submit');
+
+const noteEditorInterfaceElement      = document.getElementById('note-editor-interface');
+const noteEditorCancelElement         = document.getElementById('note-editor-cancel');
+
+const axiomEditorElement              = document.getElementById('axiom-editor');
+const axiomEditorSubmitElement        = document.getElementById('axiom-editor-submit');
+const axiomEditorCancelElement        = document.getElementById('axiom-editor-cancel');
+
+const missionStatementElement         = document.getElementById('mission-statement');
+const projectTitleElement             = document.getElementById('project-title');
+
+const noteEditorTitleElement                 = document.getElementById('note-editor-title')
+
+
+
+const projectData = {
+    notes: [],
+    axioms: []
+}
+
+
 async function displayMessage(message){
     loadingScreenMessageElement.textContent = message;
     loadingScreenElement[0].style.display = 'block';
     await new Promise(wait => setTimeout(wait, 3000))
     loadingScreenElement[0].style.display = 'none';
 }
-
-// I've realized that referring to the short writings as both realizations and notes has been extremely painful--
-// it has caused many errors.
 
 function addContent(type, title, body) {
     console.log('triggered add content event');
@@ -31,154 +57,119 @@ function addContent(type, title, body) {
     }
 
     if (type === 'note') {
-        const notesListElement = document.getElementById('realizations-list');
-        if (title === '' || body === '') {
-            alert("Something was wrong with the data in your post; failed to add it to the project.");
-            return;
-        }
+        // refactor tämä
         notesListElement.innerHTML += `
         <li>
         <h3>${title}</h3> <br>
         <p>${body}</p> <br>
         </li>
         `;
+        projectData.notes.push({title: title, body: body});
         console.log('added a note');
     } else if (type === 'axiom') {
-        const axiomsListElement = document.getElementById('axioms-list');
+        // refactor tämä
         axiomsListElement.innerHTML += `
         <li>
             <h3>${title}</h3> <br>
             <p>${body}</p> <br>
         </li>`;
+        projectData.axioms.push({title: title, body: body});
         console.log('added an axiom');
     }
-    void displayMessage(`Your ${type} titled ${title} has been added to the project!`);
-    console.log(`added ${type} ${title} to the project`);
+
+    const message = `Your ${type} titled ${title} has been added to the project!`;
+    void displayMessage(message);
+    console.log(message);
 }
 
-function sendJsonToBackend(json) {
-    // connect to the backend and pass JSON through a POST request
-    console.log('send json to backend placeholder');
-}
-
-// create a JSON object and then send it to the database
+// create a JSON object ja send it to the database
 function saveNoteToProject(note, title) {
-    sendJsonToBackend({
-        timestamp: Date.now(),
-        type: 'note',
-        title: title,
-        content: note,
-        belongs_to: document.getElementById('project-title').textContent
-    });
-
     addContent('note', title, note);
 
-    // remove the "you haven't made any realizations yet" message
-    const noNotesElement = document.getElementById('no-realizations');
+    // remove the "You haven't made any realizations yet" message
     noNotesElement.style.display = 'none';
 
     console.log('saved note to project');
 }
 
 function saveAxiomToProject(axiom, title) {
-    sendJsonToBackend({
-        timestamp: Date.now(),
-        type: 'axiom',
-        title: title,
-        content: axiom
-    });
-    console.log('saved axiom to project');
-
     addContent('axiom', title, axiom);
 
-    // remove the "you haven't made any realizations yet" message
-    const noAxiomsElement = document.getElementById('no-axioms');
+    // remove the "No axioms have been written yet" message
     noAxiomsElement.style.display = 'none';
 
     console.log('saved axiom to project')
 }
 
-clearNoteEditor = () => {
-    document.getElementById('note-editor-interface').value = '';
-    document.getElementById('note-editor-title').value = '';
+function clearNoteEditor() {
+    noteEditorInterfaceElement.value = '';
+    noteEditorTitleElement.value = '';
 }
 
 // listener for the 'jot note' button
 addNoteElement.addEventListener('click', () => {
-    const noteEditorElement = document.getElementById('realization-editor');
     noteEditorElement.style.display = 'block';
-    ableToSubmit = true;
 });
 
 // listener for the 'Add realization to project' button in the realization editor
-const noteEditorSubmitElement = document.getElementById('note-editor-submit');
 noteEditorSubmitElement.addEventListener('click', () => {
-    if (ableToSubmit === false) {
-        alert('You cannot submit a note without adding a note. How did you even get here?');
-        return;
-    }
-
-    if (document.getElementById('note-editor-interface').value === '') {
+    if (noteEditorInterfaceElement.value === '') {
         alert('Your axiom is empty; you cannot submit it.');
         return;
     }
 
     saveNoteToProject(
-        document.getElementById('note-editor-interface').value,
-        document.getElementById('note-editor-title').value
+        noteEditorInterfaceElement.value,
+        noteEditorTitleElement.value
     );
 
-    document.getElementById('realization-editor').style.display = 'none';
+    noteEditorElement.style.display = 'none';
+    clearNoteEditor(); // clear the fields
 
-    ableToSubmit = false;
-    clearNoteEditor();
     console.log("submitted note");
 });
 
-
-
 // listener for the 'cancel' button in the realization editor
-const noteEditorCancelElement = document.getElementById('note-editor-cancel');
 noteEditorCancelElement.addEventListener('click', () => {
-    const noteEditorElement = document.getElementById('realization-editor');
     noteEditorElement.style.display = 'none';
-    ableToSubmit = false;
-    clearNoteEditor();
+    clearNoteEditor(); // clear the data in the fields
 });
-
-function populateLinkDropDown() {
-    const linkDropDownElement = document.getElementById('link-dropdown');
-    const linksAvailable = document.querySelectorAll('#axioms-list li');
-    linksAvailable.forEach(link => {
-        linkDropDownElement.innerHTML += `<option value="${link.textContent}">${link.textContent}</option>`;
-    });
-    console.log('populated link dropdown');
-}
 
 // listener for the 'Develop an idea' button
 developIdeaElement.addEventListener('click', () => {
     console.log('develop idea button clicked');
-    const axiomEditorElement = document.getElementById('axiom-editor');
     axiomEditorElement.style.display = 'block';
-    ableToSubmit = true;
-    populateLinkDropDown();
     console.log('displayed axiom editor');
 });
 
-clearAxiomEditor = () => {
+
+function clearAxiomEditor() {
     document.getElementById('axiom-editor-interface').value = '';
     document.getElementById('axiom-editor-title').value = '';
-};
+}
 
-// listener for the 'Add axiom to project' button in the axiom editor
-const axiomEditorSubmitElement = document.getElementById('axiom-editor-submit');
+// only works for yksi project mutta that's fine for now.
+function saveData() {
+    const data = JSON.stringify(projectData);
+    localStorage.setItem('save_file', data);
+    console.log('saved data to localStorage');
 
-axiomEditorSubmitElement.addEventListener('click', () => {
-    if (ableToSubmit === false) {
-        alert('You cannot submit a note without adding a note. How did you even get here?');
+    console.log('data saved:');
+    console.log(data);
+}
+
+function loadData() {
+    const data = localStorage.getItem('save_file');
+    if (data === null) {
+        console.log('no data found to load');
         return;
     }
+    return JSON.parse(data);
+}
 
+// listener for the 'Add axiom to project' button in the axiom editor
+
+axiomEditorSubmitElement.addEventListener('click', () => {
     if (document.getElementById('axiom-editor-interface').value === '') {
         alert('Your axiom is empty; you cannot submit it.');
         return;
@@ -190,42 +181,61 @@ axiomEditorSubmitElement.addEventListener('click', () => {
     );
 
     document.getElementById('axiom-editor').style.display = 'none';
-    ableToSubmit = false;
     clearAxiomEditor();
 });
 
 // listener for the 'cancel' button in the axiom editor
-const axiomEditorCancelElement = document.getElementById('axiom-editor-cancel');
 axiomEditorCancelElement.addEventListener('click', () => {
-    const axiomEditorElement = document.getElementById('axiom-editor');
     axiomEditorElement.style.display = 'none';
-    ableToSubmit = false;
-    clearAxiomEditor();
+    clearAxiomEditor(); // clear the text fields
 });
-
-
 
 // listener for the 'Publish your findings' button
 publishFindingsElement.addEventListener('click', () => {
-    alert('Sorry! This feature is not yet implemented.');
+    alert('Sorry! This feature has not been implemented yet.');
 })
 
 // listener for the 'See other choices' button
 moreOptionsElement.addEventListener('click', () => {
-    alert('Sorry! This feature is not yet implemented.');
+    alert('Sorry! This feature has not been implemented yet.');
 })
 
+saveDataElement.addEventListener('click', () => {
+   saveData();
+});
 
-const populateWithData = (projectData) => {
-    let missionStatementElement = document.getElementById('mission-statement');
+loadDataElement.addEventListener('click', () => {
+    restoreAxiomsAndNotes();
+});
+
+function restoreAxiomsAndNotes() {
+    const projectContent = loadData();
+
+    if (projectContent == null) {
+        console.log('nothing to restore');
+        return;
+    }
+
+    projectContent.notes.forEach(piece => {
+        addContent('note', piece.title, piece.body);
+    });
+    projectContent.axioms.forEach(piece => {
+        addContent('axiom', piece.title, piece.body);
+    })
+}
+
+// restore the mission statement and project title data
+function populateWithData(projectData) {
     missionStatementElement.textContent = projectData.goal;
 
-    let projectTitleElement = document.getElementById('project-title');
     projectTitleElement.textContent = projectData.title;
+
+    restoreAxiomsAndNotes();
 }
 
 // get the current project name
 let currentProjectName = '';
+
 try {
     currentProjectName = localStorage.getItem('current_project');
     if (currentProjectName === null) {
@@ -237,6 +247,7 @@ try {
 
 // get the data using the current project name
 let currentProjectData = '';
+
 try {
     const thisProjectData = `${currentProjectName}_creation_data`;
     currentProjectData = localStorage.getItem(thisProjectData);
@@ -246,3 +257,4 @@ try {
 }
 
 populateWithData(currentProjectData);
+
