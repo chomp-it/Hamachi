@@ -1,7 +1,5 @@
 const addNoteElement                  = document.getElementById('jot-note');
 const developIdeaElement              = document.getElementById('develop-idea');
-const publishFindingsElement          = document.getElementById('publish-findings');
-const moreOptionsElement              = document.getElementById('more-options');
 const saveDataElement                 = document.getElementById('save-project');
 const loadDataElement                 = document.getElementById('load-data');
 
@@ -26,12 +24,12 @@ const axiomEditorCancelElement        = document.getElementById('axiom-editor-ca
 const missionStatementElement         = document.getElementById('mission-statement');
 const projectTitleElement             = document.getElementById('project-title');
 
-const noteEditorTitleElement                 = document.getElementById('note-editor-title')
+const noteEditorTitleElement          = document.getElementById('note-editor-title')
 
 
 
 const projectData = {
-    notes: [],
+    notes:  [],
     axioms: []
 }
 
@@ -60,6 +58,23 @@ function addContent(type, title, body, time) {
         console.log('time is null');
     }
 
+    const duplicateNote = projectData.notes.some(note => {
+        if (note.title === title || note.body === body) {
+            return true;
+        }
+    });
+
+    const duplicateAxiom = projectData.axioms.some(axiom => {
+        if (axiom.title === title || axiom.body === body) {
+            return true;
+        }
+    });
+
+    if (duplicateNote || duplicateAxiom) {
+        console.log('duplicate detected');
+        return;
+    }
+
     if (type === 'note') {
         // refactor tämä
         notesListElement.innerHTML += `
@@ -74,10 +89,10 @@ function addContent(type, title, body, time) {
         // refactor tämä
         axiomsListElement.innerHTML += `
         <li>
-            <h3>${title}</h3> <br>
+            <h3>${title} – added at ${time}</h3> <br>
             <p>${body}</p> <br>
         </li>`;
-        projectData.axioms.push({title: title, body: body});
+        projectData.axioms.push({title: title, body: body, time: time});
         console.log('added an axiom');
     }
 
@@ -100,7 +115,11 @@ function saveNoteToProject(note, title) {
 }
 
 function saveAxiomToProject(axiom, title) {
-    addContent('axiom', title, axiom);
+    const date = new Date();
+    const minutes = date.getMinutes();
+    const hours = date.getHours();
+    const time = `${hours}:${minutes}`;
+    addContent('axiom', title, axiom, time);
 
     // remove the "No axioms have been written yet" message
     noAxiomsElement.style.display = 'none';
@@ -197,16 +216,6 @@ axiomEditorCancelElement.addEventListener('click', () => {
     clearAxiomEditor(); // clear the text fields
 });
 
-// listener for the 'Publish your findings' button
-publishFindingsElement.addEventListener('click', () => {
-    alert('Sorry! This feature has not been implemented yet.');
-})
-
-// listener for the 'See other choices' button
-moreOptionsElement.addEventListener('click', () => {
-    alert('Sorry! This feature has not been implemented yet.');
-})
-
 saveDataElement.addEventListener('click', () => {
    saveData();
 });
@@ -219,7 +228,7 @@ function restoreAxiomsAndNotes() {
     const projectContent = loadData();
 
     if (projectContent == null) {
-        console.log('nothing to restore');
+        console.log('found nothing to restore');
         return;
     }
 
@@ -240,8 +249,7 @@ function populateWithData(projectData) {
     }
 
     missionStatementElement.textContent = projectData.goal;
-
-    projectTitleElement.textContent = projectData.title;
+    projectTitleElement.textContent     = projectData.title;
 
     restoreAxiomsAndNotes();
 }
