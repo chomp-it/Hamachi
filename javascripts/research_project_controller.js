@@ -2,6 +2,8 @@ const addNoteElement                  = document.getElementById('jot-note');
 const developIdeaElement              = document.getElementById('develop-idea');
 const saveDataElement                 = document.getElementById('save-project');
 const loadDataElement                 = document.getElementById('load-data');
+const retakeSurveyElement             = document.getElementById('retake-survey');
+
 
 const loadingScreenElement = document.getElementsByClassName('loading-screen');
 const loadingScreenMessageElement     = document.getElementById('loading-screen-message');
@@ -26,12 +28,14 @@ const projectTitleElement             = document.getElementById('project-title')
 
 const noteEditorTitleElement          = document.getElementById('note-editor-title')
 
-
+const retakeSurveyDivElement          = document.getElementById('retake-survey-div');
 
 const projectData = {
     notes:  [],
     axioms: []
 }
+
+let ableToRetakeSurvey = false;
 
 
 async function displayMessage(message){
@@ -168,6 +172,10 @@ developIdeaElement.addEventListener('click', () => {
     console.log('displayed axiom editor');
 });
 
+retakeSurveyElement.addEventListener('click', () => {
+
+})
+
 
 function clearAxiomEditor() {
     document.getElementById('axiom-editor-interface').value = '';
@@ -240,21 +248,49 @@ function restoreAxiomsAndNotes() {
     });
 }
 
-// restore the mission statement and project title data
-function populateWithData(projectData) {
+function restoreSurvey(surveyData) {
+    retakeSurveyElement.style.display = 'block';
+    ableToRetakeSurvey = true;
 
-    if (projectData == null) {
-        console.log('no project data found');
+    if (surveyData == null) {
+        console.log('no survey data found to restore');
         return;
     }
 
-    missionStatementElement.textContent = projectData.goal;
-    projectTitleElement.textContent     = projectData.title;
+    surveyData.forEach(pair => {
+        const question = pair[0];
+        const answer = pair[1];
 
-    restoreAxiomsAndNotes();
+        retakeSurveyDivElement.innerHTML += `
+        question: <br>
+        ${question} <br>
+        answer: <br>
+        ${answer} <br>
+        `;
+    });
 }
 
-const currentProjectData = loadData();
+// restore the mission statement and project title data
+function populateWithData(config) {
+    if (config == null) {
+        // the page would be broken and (mostly) unusable otherwise
+        window.location.href = '../views/user_homepage.html';
+        return;
+    }
 
-populateWithData(currentProjectData);
+    missionStatementElement.textContent = config.goal;
+    projectTitleElement.textContent     = config.title;
+
+    restoreAxiomsAndNotes();
+
+    if (projectData.survey != null && projectData.survey.length > 0) {
+        restoreSurvey(projectData.survey);
+    } else {
+        console.log('no survey data found to restore');
+    }
+}
+
+
+const config = JSON.parse(localStorage.getItem('config'));
+populateWithData(config);
 
