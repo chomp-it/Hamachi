@@ -2,8 +2,8 @@ const addNoteElement                  = document.getElementById('jot-note');
 const developIdeaElement              = document.getElementById('develop-idea');
 const saveDataElement                 = document.getElementById('save-project');
 const loadDataElement                 = document.getElementById('load-data');
-const retakeSurveyElement             = document.getElementById('retake-survey');
-
+const retakeSurveyElement             = document.getElementById('retake-survey-button');
+const reviewPreSurveyElement          = document.getElementById('review-pre-survey');
 
 const loadingScreenElement = document.getElementsByClassName('loading-screen');
 const loadingScreenMessageElement     = document.getElementById('loading-screen-message');
@@ -28,7 +28,10 @@ const projectTitleElement             = document.getElementById('project-title')
 
 const noteEditorTitleElement          = document.getElementById('note-editor-title')
 
+const preSurveyDivElement             = document.getElementById('pre-survey-div');
+
 const retakeSurveyDivElement          = document.getElementById('retake-survey-div');
+
 
 const projectData = {
     notes:  [],
@@ -36,7 +39,8 @@ const projectData = {
 }
 
 let ableToRetakeSurvey = false;
-
+// so the user can only retake the survey once
+let retookSurvey = false;
 
 async function displayMessage(message){
     loadingScreenMessageElement.textContent = message;
@@ -173,8 +177,56 @@ developIdeaElement.addEventListener('click', () => {
 });
 
 retakeSurveyElement.addEventListener('click', () => {
+    if (!ableToRetakeSurvey) {
+        return; // the button shouldn't even be visible if this is the case
+    }
 
-})
+    if (retookSurvey) {
+        alert("" +
+            "You've already retaken the survey. " +
+            "You can see your results somewhere. " +
+            "I don't know where, but somewhere."
+        );
+    }
+
+    const confirmRetake = confirm("" +
+        "Are you sure you want to retake the survey?" +
+        "You can only retake this once; make sure you believe you are ready." +
+        "You can still review your pre-survey"
+    );
+    if (!confirmRetake) {
+        return;
+    }
+
+    if (retakeSurveyDivElement.style.display === 'block') {
+        retakeSurveyDivElement.style.display = 'none';
+    } else if (retakeSurveyDivElement.style.display === 'none') {
+        retakeSurveyDivElement.style.display = 'block';
+        populateSurveyFields(config.survey); // should probably just call this once
+    }
+});
+
+function populateSurveyFields(surveyData) {
+    if (surveyData == null) {
+        console.log('survey data is null');
+        return;
+    }
+
+    const pairs = surveyData[0];
+
+    pairs.forEach(pair => {
+        const question = pair[0];
+        const identifier = `answer-${question}`;
+        retakeSurveyDivElement.innerHTML += `
+        <h4>question:</h4> <br>
+        <p>${question}</p> <br>
+        <h4>answer:</h4> <br>
+        <textarea id="${identifier}"></textarea> <br>
+        `;
+    });
+    console.log('survey fields populated');
+}
+
 
 
 function clearAxiomEditor() {
@@ -232,6 +284,18 @@ loadDataElement.addEventListener('click', () => {
     restoreAxiomsAndNotes();
 });
 
+reviewPreSurveyElement.addEventListener('click', () => {
+    console.log('review pre survey button clicked');
+    if (preSurveyDivElement.style.display === 'block') {
+        preSurveyDivElement.style.display = 'none';
+        console.log('hidden pre survey div');
+    } else {
+        preSurveyDivElement.style.display = 'block';
+        console.log('displayed pre survey div');
+    }
+});
+
+
 function restoreAxiomsAndNotes() {
     const projectContent = loadData();
 
@@ -257,15 +321,16 @@ function restoreSurvey(surveyData) {
         return;
     }
 
-    surveyData.forEach(pair => {
-        const question = pair[0];
-        const answer = pair[1];
+    const pairs = surveyData[0];
 
-        retakeSurveyDivElement.innerHTML += `
-        question: <br>
-        ${question} <br>
-        answer: <br>
-        ${answer} <br>
+    pairs.forEach(pair => {
+        const question = pair[0];
+        const answer   = pair[1];
+        preSurveyDivElement.innerHTML += `
+        <h4>question:</h4> <br>
+        <p>${question}</p> <br>
+        <h4>answer:</h4> <br>
+        <p>${answer}</p> <br>
         `;
     });
 }
@@ -273,7 +338,8 @@ function restoreSurvey(surveyData) {
 // restore the mission statement and project title data
 function populateWithData(config) {
     if (config == null) {
-        // the page would be broken and (mostly) unusable otherwise
+        // this page would be broken and (mostly) unusable otherwise.
+        // consider adding a warning message like alert()
         window.location.href = '../views/user_homepage.html';
         return;
     }
@@ -283,13 +349,12 @@ function populateWithData(config) {
 
     restoreAxiomsAndNotes();
 
-    if (projectData.survey != null && projectData.survey.length > 0) {
-        restoreSurvey(projectData.survey);
+    if (config.survey != null && config.survey.length > 0) {
+        restoreSurvey(config.survey);
     } else {
         console.log('no survey data found to restore');
     }
 }
-
 
 const config = JSON.parse(localStorage.getItem('config'));
 populateWithData(config);

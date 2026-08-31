@@ -38,6 +38,8 @@ function getFilledSurveyFields() {
             filledFields.push([question.value, answer.value]);
         }
     }
+    console.log('filled fields:');
+    console.log(filledFields);
     return filledFields;
 }
 
