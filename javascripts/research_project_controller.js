@@ -43,12 +43,12 @@ const submitSurveyRetake = document.getElementById('submit-survey-retake');
 const projectData = {
     notes:  [],
     axioms: [],
-    post_survey: []
+    retook_survey: false,
+    survey_questions: [],
+    post_survey_answers: []
 }
 
 let ableToRetakeSurvey = false;
-// so the user can only retake the survey once
-let retookSurvey = false;
 
 async function displayMessage(message){
     loadingScreenMessageElement.textContent = message;
@@ -65,23 +65,19 @@ async function displayBadMessage(message) {
 }
 
 function addContent(type, title, body, time) {
-    console.log('triggered add content event');
-
     if (body === "") {
         alert('Yeli, your note is lacking a body. Kinda important, hombre.');
         return;
     }
-
     if (title === "") {
         alert('Your note is missing a title, broidi. You need that.');
         return;
     }
-
     if (time == null) {
         console.log('time is null');
     }
     // ^^^ this is the price of considerate error messages.
-    // I could pull a Google and wrap all of these checks in a two-line conditional, but that would be rude
+    // I could pull a Google and wrap all of these checks in a two-line conditional, but that would be inconsiderate
 
     const duplicateNote = projectData.notes.some(note => {
         if (note.title === title || note.body === body) {
@@ -188,7 +184,7 @@ function verifySurveyFields() {
             alert('You failed to answer question: ' + identifier);
             return;
         }
-        answers.push(identifier.value);
+        answers.push(element.value);
     });
     return answers;
 }
@@ -201,8 +197,8 @@ submitSurveyRetake.addEventListener('click', () => {
         return;
     }
 
-    retookSurvey = true;
-    projectData.post_survey.push(answers);
+    projectData.retook_survey = true;
+    projectData.post_survey_answers.push(answers);
 
     console.log('survey retake submitted');
 
@@ -211,7 +207,7 @@ submitSurveyRetake.addEventListener('click', () => {
     retakeSurveyAdditionalElements.forEach(element => {
         element.style.display = 'none';
     });
-    saveData()
+    saveData();
 });
 
 // listener for the 'cancel' button in the realization editor
@@ -222,9 +218,7 @@ noteEditorCancelElement.addEventListener('click', () => {
 
 // listener for the 'Develop an idea' button
 developIdeaElement.addEventListener('click', () => {
-    console.log('develop idea button clicked');
     axiomEditorElement.style.display = 'block';
-    console.log('displayed axiom editor');
 });
 
 retakeSurveyElement.addEventListener('click', () => {
@@ -232,12 +226,13 @@ retakeSurveyElement.addEventListener('click', () => {
         return; // the button shouldn't even be visible if this is the case
     }
 
-    if (retookSurvey) {
+    if (projectData.retook_survey === true) {
         alert("" +
             "You've already retaken the survey. " +
             "You can see your results somewhere. " +
             "I don't know where, but somewhere."
         );
+        return;
     }
 
     if (retakeSurveyDivElement.style.display === 'block') {
@@ -315,7 +310,7 @@ function saveData() {
 
 function loadData() {
     const data = localStorage.getItem('save_file');
-    if (data === null) {
+    if (data == null) {
         void displayBadMessage('There is no data to load.');
         console.log('no data found to load');
         return;
@@ -351,6 +346,7 @@ saveDataElement.addEventListener('click', () => {
 });
 
 loadDataElement.addEventListener('click', () => {
+    console.log('load data button clicked');
     restoreAxiomsAndNotes();
 });
 
@@ -367,6 +363,7 @@ reviewPreSurveyElement.addEventListener('click', () => {
 
 
 function restoreAxiomsAndNotes() {
+    console.log('restoring axioms and notes');
     const projectContent = loadData();
 
     if (projectContent == null) {
@@ -405,6 +402,19 @@ function restoreSurvey(surveyData) {
     });
 }
 
+function restoreSurveyRetake(data) {
+    if (data.retook_survey === false) {
+        ableToRetakeSurvey = true;
+        return;
+    }
+    ableToRetakeSurvey = false;
+    retakeSurveyElement.style.display = 'none';
+    retakeSurveyDivElement.style.display = 'none';
+    retakeSurveyAdditionalElements.forEach(element => {
+        element.style.display = 'none';
+    });
+}
+
 // restore the mission statement and project title data
 function populateWithData(config) {
     if (config == null) {
@@ -418,14 +428,15 @@ function populateWithData(config) {
     projectTitleElement.textContent     = config.title;
 
     restoreAxiomsAndNotes();
-
     if (config.survey != null && config.survey.length > 0) {
         restoreSurvey(config.survey);
+        restoreSurveyRetake(loadData());
     } else {
         console.log('no survey data found to restore');
     }
 }
 
 const config = JSON.parse(localStorage.getItem('config'));
+projectData.survey_questions = config.survey;
 populateWithData(config);
 
