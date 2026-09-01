@@ -32,10 +32,16 @@ const preSurveyDivElement             = document.getElementById('pre-survey-div'
 
 const retakeSurveyDivElement          = document.getElementById('retake-survey-div');
 
+const retakeSurveyAdditionalElements = document.querySelectorAll(
+    '.retake-survey-additionals'
+);
+
+const submitSurveyRetake = document.getElementById('submit-survey-retake');
 
 const projectData = {
     notes:  [],
-    axioms: []
+    axioms: [],
+    post_survey: []
 }
 
 let ableToRetakeSurvey = false;
@@ -65,6 +71,8 @@ function addContent(type, title, body, time) {
     if (time == null) {
         console.log('time is null');
     }
+    // ^^^ this is the price of considerate error messages.
+    // I could pull a Google and wrap all of these checks in a two line conditional but that would be rude
 
     const duplicateNote = projectData.notes.some(note => {
         if (note.title === title || note.body === body) {
@@ -163,6 +171,40 @@ noteEditorSubmitElement.addEventListener('click', () => {
     console.log("submitted note");
 });
 
+function verifySurveyFields() {
+    let answers = [];
+    identifiersForLater.forEach(identifier => {
+        const element = document.getElementById(identifier);
+        if (element.value === '') {
+            alert('You failed to answer question: ' + identifier);
+            return;
+        }
+        answers.push(identifier.value);
+    });
+    return answers;
+}
+
+submitSurveyRetake.addEventListener('click', () => {
+    const answers = verifySurveyFields();
+    const confirmSubmission = confirm("Are you sure you want to submit?");
+
+    if (!confirmSubmission) {
+        return;
+    }
+
+    retookSurvey = true;
+    projectData.post_survey.push(answers);
+
+    console.log('survey retake submitted');
+
+    // hide the interface
+    retakeSurveyDivElement.style.display = 'none';
+    retakeSurveyAdditionalElements.forEach(element => {
+        element.style.display = 'none';
+    });
+    saveData()
+});
+
 // listener for the 'cancel' button in the realization editor
 noteEditorCancelElement.addEventListener('click', () => {
     noteEditorElement.style.display = 'none';
@@ -189,22 +231,32 @@ retakeSurveyElement.addEventListener('click', () => {
         );
     }
 
-    const confirmRetake = confirm("" +
-        "Are you sure you want to retake the survey?" +
-        "You can only retake this once; make sure you believe you are ready." +
-        "You can still review your pre-survey"
-    );
-    if (!confirmRetake) {
-        return;
-    }
-
     if (retakeSurveyDivElement.style.display === 'block') {
         retakeSurveyDivElement.style.display = 'none';
+        // make this its own function
+        retakeSurveyAdditionalElements.forEach(element => {
+            element.style.display = 'none';
+        });
     } else if (retakeSurveyDivElement.style.display === 'none') {
+        const confirmRetake = confirm("" +
+            "Are you sure you want to retake the survey? " +
+            "You can only retake this once; make sure you believe you are ready." +
+            " You can still review your pre-survey."
+        );
+        if (!confirmRetake) {
+            return;
+        }
         retakeSurveyDivElement.style.display = 'block';
+        retakeSurveyAdditionalElements.forEach(element => {
+            element.style.display = 'block';
+        });
         populateSurveyFields(config.survey); // should probably just call this once
     }
 });
+
+// this is used to lookup the textareas for the submit logic.
+// this is quite sloppy but otherwise I'd need to essentially write a parser in this already monolithic file
+let identifiersForLater = [];
 
 function populateSurveyFields(surveyData) {
     if (surveyData == null) {
@@ -217,6 +269,7 @@ function populateSurveyFields(surveyData) {
     pairs.forEach(pair => {
         const question = pair[0];
         const identifier = `answer-${question}`;
+        identifiersForLater.push(identifier);
         retakeSurveyDivElement.innerHTML += `
         <h4>question:</h4> <br>
         <p>${question}</p> <br>
@@ -234,7 +287,7 @@ function clearAxiomEditor() {
     document.getElementById('axiom-editor-title').value = '';
 }
 
-// only works for yksi project mutta that's fine for now.
+// only works for yksi project mutta on fine for now.
 function saveData() {
     const data = JSON.stringify(projectData);
     localStorage.setItem('save_file', data);
@@ -251,10 +304,10 @@ function loadData() {
         return;
     }
     return JSON.parse(data);
+    // this may need to be updated for survey stuff
 }
 
 // listener for the 'Add axiom to project' button in the axiom editor
-
 axiomEditorSubmitElement.addEventListener('click', () => {
     if (document.getElementById('axiom-editor-interface').value === '') {
         alert('Your axiom is empty; you cannot submit it.');
