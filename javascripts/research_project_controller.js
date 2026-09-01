@@ -8,6 +8,8 @@ const reviewPreSurveyElement          = document.getElementById('review-pre-surv
 const loadingScreenElement = document.getElementsByClassName('loading-screen');
 const loadingScreenMessageElement     = document.getElementById('loading-screen-message');
 
+const badMessageElement               = document.getElementById('bad-message-content');
+
 const notesListElement                = document.getElementById('realizations-list');
 const axiomsListElement               = document.getElementById('axioms-list');
 const noNotesElement                  = document.getElementById('no-realizations');
@@ -55,6 +57,13 @@ async function displayMessage(message){
     loadingScreenElement[0].style.display = 'none';
 }
 
+async function displayBadMessage(message) {
+    badMessageElement.textContent = message;
+    badMessageElement.style.display = 'block';
+    await new Promise(wait => setTimeout(wait, 3000))
+    badMessageElement.style.display = 'none';
+}
+
 function addContent(type, title, body, time) {
     console.log('triggered add content event');
 
@@ -72,7 +81,7 @@ function addContent(type, title, body, time) {
         console.log('time is null');
     }
     // ^^^ this is the price of considerate error messages.
-    // I could pull a Google and wrap all of these checks in a two line conditional but that would be rude
+    // I could pull a Google and wrap all of these checks in a two-line conditional, but that would be rude
 
     const duplicateNote = projectData.notes.some(note => {
         if (note.title === title || note.body === body) {
@@ -257,8 +266,14 @@ retakeSurveyElement.addEventListener('click', () => {
 // this is used to lookup the textareas for the submit logic.
 // this is quite sloppy but otherwise I'd need to essentially write a parser in this already monolithic file
 let identifiersForLater = [];
+let populatedSurveyFields = false;
 
 function populateSurveyFields(surveyData) {
+    if (populatedSurveyFields) {
+        console.log('aborted populateSurveyFields due to the fields already being populated.');
+        return;
+    }
+
     if (surveyData == null) {
         console.log('survey data is null');
         return;
@@ -278,6 +293,7 @@ function populateSurveyFields(surveyData) {
         `;
     });
     console.log('survey fields populated');
+    populatedSurveyFields = true;
 }
 
 
@@ -300,6 +316,7 @@ function saveData() {
 function loadData() {
     const data = localStorage.getItem('save_file');
     if (data === null) {
+        void displayBadMessage('There is no data to load.');
         console.log('no data found to load');
         return;
     }
