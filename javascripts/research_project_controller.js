@@ -228,13 +228,11 @@ function restoreSurvey(surveyData) {
     }
 
     surveyData.forEach(pair => {
-        const question = pair[0];
-        const answer   = pair[1];
         preSurveyDivElement.innerHTML += `
         <h4>question:</h4> <br>
-        <p>${question}</p> <br>
+        <p>${pair[0]}</p> <br>
         <h4>answer:</h4> <br>
-        <p>${answer}</p> <br>
+        <p>${pair[1]}</p> <br>
         `;
     });
 }
@@ -263,7 +261,12 @@ function populateWithData(config) {
     restoreAxiomsAndNotes();
     if (config.survey != null && config.survey.length > 0) {
         restoreSurvey(config.survey);
-        restoreSurveyRetake(loadData());
+        const data = loadData();
+        if (data != null) {
+            restoreSurveyRetake(data);
+        } else {
+            log('no data found to restore');
+        }
     } else {
         log('no survey data found to restore');
     }
