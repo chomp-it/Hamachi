@@ -155,6 +155,7 @@ let identifiersForLater = [];
 let populatedSurveyFields = false;
 
 function populateSurveyFields(surveyData) {
+    console.log('populateSurveyFields called');
     if (populatedSurveyFields) {
         log('aborted populateSurveyFields due to the fields already being populated.');
         return;
@@ -260,6 +261,7 @@ function populateWithData(config) {
 
     restoreAxiomsAndNotes();
     if (config.survey != null && config.survey.length > 0) {
+
         restoreSurvey(config.survey);
         const data = loadData();
         if (data != null) {
@@ -283,7 +285,6 @@ function handleNoteEditorSubmit() {
         noteEditorTitleElement.value
     );
 
-    noteEditorElement.style.display = 'none';
     hide(noteEditorElement);
     clearNoteEditor(); // clear the fields
 
@@ -310,6 +311,8 @@ function handleSurveyRetakeSubmission() {
 function handleRetakeSurveyElementClick() {
     if (!ableToRetakeSurvey) {
         return; // the button shouldn't even be visible if this is the case
+    } else {
+        displaySurveyElements();
     }
 
     if (projectData.retook_survey === true) {
@@ -322,19 +325,21 @@ function handleRetakeSurveyElementClick() {
     }
 
     if (retakeSurveyDivElement.style.display === 'block') {
-        hideSurveyElements();
-    } else if (retakeSurveyDivElement.style.display === 'none') {
+        hideSurveyElements()
+    }
+
+    if (retakeSurveyDivElement.style.display === 'none') {
         const confirmRetake = confirm("" +
             "Are you sure you want to retake the survey? " +
             "You can only retake this once; make sure you believe you are ready." +
-            " You can still review your pre-survey."
+            " You can still review your pre-survey. " +
+            "You will not be able to cancel this attempt."
         );
         if (!confirmRetake) {
             return;
         }
         displaySurveyElements();
-
-        populateSurveyFields(config.survey); // should probably just call this once
+        populateSurveyFields(config.survey);
     }
 }
 
