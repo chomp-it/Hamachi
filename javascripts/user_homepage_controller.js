@@ -22,10 +22,8 @@ const surveyAnswer2                = document.getElementById('survey-answer-2');
 const surveyQuestion3              = document.getElementById('survey-question-3');
 const surveyAnswer3                = document.getElementById('survey-answer-3');
 
-
 let displayingSurveyFields = false;
 let displayingMoreSurveyInfo = false;
-
 
 // this may need fixing
 function getFilledSurveyFields() {
@@ -47,9 +45,7 @@ function getAllCreationData() {
     return {
         title: projectTitleField.value,
         goal: projectGoalField.value,
-        survey: [
-            getFilledSurveyFields()
-        ]
+        survey: getFilledSurveyFields()
     };
 }
 
