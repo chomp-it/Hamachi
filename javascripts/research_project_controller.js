@@ -5,6 +5,8 @@ const saveDataElement                 = document.getElementById('save-project');
 const loadDataElement                 = document.getElementById('load-data');
 const retakeSurveyElement             = document.getElementById('retake-survey-button');
 const reviewPreSurveyElement          = document.getElementById('review-pre-survey');
+const reviewPostSurveyElement         = document.getElementById('review-post-survey');
+
 
 const loadingScreenMessageElement     = document.getElementById('loading-screen-message');
 const badMessageElement               = document.getElementById('bad-message-content');
@@ -39,8 +41,9 @@ const retakeSurveyAdditionalElements = document.querySelectorAll(
     '.retake-survey-additionals'
 );
 
-const submitSurveyRetake = document.getElementById('submit-survey-retake');
+const submitSurveyRetake              = document.getElementById('submit-survey-retake');
 
+const postSurveyDivElement            = document.getElementById('review-post-survey-div');
 
 
 const projectData = {
@@ -192,14 +195,16 @@ function saveData() {
 }
 
 function loadData() {
-    const data = localStorage.getItem('save_file');
+    const data = JSON.parse(localStorage.getItem('save_file'));
     if (data == null) {
         void displayMessage('There is no data to load.', 'bad');
         log('no data found to load');
         return;
     }
-    return JSON.parse(data);
-    // this may need to be updated for survey stuff
+    if (data.retook_survey === true) {
+        display(reviewPostSurveyElement);
+    }
+    return data;
 }
 
 function restoreAxiomsAndNotes() {
@@ -306,6 +311,7 @@ function handleSurveyRetakeSubmission() {
 
     hideSurveyElements();
     saveData();
+    display(reviewPostSurveyElement);
 }
 
 function handleRetakeSurveyElementClick() {
@@ -369,7 +375,46 @@ function handlePreSurveyReview() {
     }
 }
 
+let populatedPostSurvey = false;
+function handlePostSurveyReview() {
+    if (postSurveyDivElement.style.display === 'block') {
+        hide(postSurveyDivElement);
+    } else {
+        display(postSurveyDivElement);
+    }
+
+    if (populatedPostSurvey) {
+        return;
+    }
+
+    const data           = loadData();
+
+    const postSurveyData = data.post_survey_answers[0];
+    const questions      = config.survey;
+
+    let increment = 0;
+    let questionAndAnswerIncrement = 1;
+
+    postSurveyData.forEach(answer => {
+        const question = questions[increment][0];
+        console.log('question:');
+        console.log(question);
+        postSurveyDivElement.innerHTML += `
+        <b>question ${questionAndAnswerIncrement}:</b> <br>
+        ${question} <br>
+        answer ${questionAndAnswerIncrement}: <br>
+        ${answer} <br>
+        <br>
+        `;
+        increment++;
+        questionAndAnswerIncrement++;
+    });
+    populatedPostSurvey = true;
+}
+
 const config = JSON.parse(localStorage.getItem('config'));
 projectData.survey_questions = config.survey;
 populateWithData(config);
+
+
 

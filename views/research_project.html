@@ -39,9 +39,6 @@
     <hr>
 </div>
 
-<!--
-I'm not a designer; I'm a programmer. I'm not going to design a loading spinner
--->
 <div class="loading-screen" style="display: block;">
     <p id="loading-screen-message" style="color: #038c03"></p>
 </div>
@@ -86,7 +83,7 @@ I'm not a designer; I'm a programmer. I'm not going to design a loading spinner
     <button id="load-data">Load data</button>
     <button id="retake-survey-button">Retake survey</button>
     <button id="review-pre-survey">See your answers to the pre-survey</button>
-    <button id="review-post-survey">See your answers to the post-survey</button>
+    <button id="review-post-survey" style="display: none">See your answers to the post-survey</button>
     <hr>
 </div>
 
@@ -105,6 +102,10 @@ I'm not a designer; I'm a programmer. I'm not going to design a loading spinner
     <!--Populated with JavaScript-->
 </div>
 <button class="retake-survey-additionals" id="submit-survey-retake" style="display: none">Submit</button>
+
+<div id="review-post-survey-div" style="display: none">
+    <!--Populated with JavaScript-->
+</div>
 
 <script src="../javascripts/research_project_helpers.js"></script>
 <script src="../javascripts/research_project_controller.js"></script>

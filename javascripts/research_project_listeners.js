@@ -51,3 +51,7 @@ reviewPreSurveyElement.addEventListener('click', () => {
 addNoteElement.addEventListener('click', () => {
     display(noteEditorElement);
 });
+
+reviewPostSurveyElement.addEventListener('click', () => {
+    handlePostSurveyReview();
+})
