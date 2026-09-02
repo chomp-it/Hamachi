@@ -1,3 +1,4 @@
+// main buttons
 const addNoteElement                  = document.getElementById('jot-note');
 const developIdeaElement              = document.getElementById('develop-idea');
 const saveDataElement                 = document.getElementById('save-project');
@@ -5,13 +6,13 @@ const loadDataElement                 = document.getElementById('load-data');
 const retakeSurveyElement             = document.getElementById('retake-survey-button');
 const reviewPreSurveyElement          = document.getElementById('review-pre-survey');
 
-const loadingScreenElement = document.getElementsByClassName('loading-screen');
 const loadingScreenMessageElement     = document.getElementById('loading-screen-message');
-
 const badMessageElement               = document.getElementById('bad-message-content');
 
 const notesListElement                = document.getElementById('realizations-list');
 const axiomsListElement               = document.getElementById('axioms-list');
+
+// the messages that appear when there are no notes or axioms
 const noNotesElement                  = document.getElementById('no-realizations');
 const noAxiomsElement                 = document.getElementById('no-axioms');
 
@@ -40,6 +41,8 @@ const retakeSurveyAdditionalElements = document.querySelectorAll(
 
 const submitSurveyRetake = document.getElementById('submit-survey-retake');
 
+
+
 const projectData = {
     notes:  [],
     axioms: [],
@@ -49,20 +52,6 @@ const projectData = {
 }
 
 let ableToRetakeSurvey = false;
-
-async function displayMessage(message){
-    loadingScreenMessageElement.textContent = message;
-    loadingScreenElement[0].style.display = 'block';
-    await new Promise(wait => setTimeout(wait, 3000))
-    loadingScreenElement[0].style.display = 'none';
-}
-
-async function displayBadMessage(message) {
-    badMessageElement.textContent = message;
-    badMessageElement.style.display = 'block';
-    await new Promise(wait => setTimeout(wait, 3000))
-    badMessageElement.style.display = 'none';
-}
 
 function addContent(type, title, body, time) {
     if (body === "") {
@@ -74,7 +63,7 @@ function addContent(type, title, body, time) {
         return;
     }
     if (time == null) {
-        console.log('time is null');
+        log('time is null');
     }
     // ^^^ this is the price of considerate error messages.
     // I could pull a Google and wrap all of these checks in a two-line conditional, but that would be inconsiderate
@@ -92,12 +81,13 @@ function addContent(type, title, body, time) {
     });
 
     if (duplicateNote || duplicateAxiom) {
-        console.log('duplicate detected');
+        log('duplicate detected');
         return;
     }
 
     if (type === 'note') {
-        // refactor tämä
+        // refactor tämä.
+        // For now it's fine koska we have ei listeners
         notesListElement.innerHTML += `
         <li>
         <h3>${title} – added at ${time}</h3> <br>
@@ -105,7 +95,7 @@ function addContent(type, title, body, time) {
         </li>
         `;
         projectData.notes.push({title: title, body: body, time: time});
-        console.log('added a note');
+        log('added a note');
     } else if (type === 'axiom') {
         // refactor tämä
         axiomsListElement.innerHTML += `
@@ -114,38 +104,29 @@ function addContent(type, title, body, time) {
             <p>${body}</p> <br>
         </li>`;
         projectData.axioms.push({title: title, body: body, time: time});
-        console.log('added an axiom');
+        log('added an axiom');
     }
-
-    const message = `Your ${type} titled ${title} has been added to the project!`;
-    void displayMessage(message);
-    console.log(message);
+    void displayMessage(`Your ${type} titled ${title} has been added to the project!`);
 }
 
 function saveNoteToProject(note, title) {
-    const date = new Date();
-    const minutes = date.getMinutes();
-    const hours = date.getHours();
-    const time = `${hours}:${minutes}`;
+    const time = getTime();
     addContent('note', title, note, time);
 
     // remove the "You haven't made any realizations yet" message
-    noNotesElement.style.display = 'none';
+    hide(noNotesElement);
 
-    console.log('saved note to project');
+    log('saved note to project');
 }
 
 function saveAxiomToProject(axiom, title) {
-    const date = new Date();
-    const minutes = date.getMinutes();
-    const hours = date.getHours();
-    const time = `${hours}:${minutes}`;
+    const time = getTime();
     addContent('axiom', title, axiom, time);
 
     // remove the "No axioms have been written yet" message
-    noAxiomsElement.style.display = 'none';
+    hide(noAxiomsElement);
 
-    console.log('saved axiom to project')
+    log('saved axiom to project')
 }
 
 function clearNoteEditor() {
@@ -153,28 +134,7 @@ function clearNoteEditor() {
     noteEditorTitleElement.value = '';
 }
 
-// listener for the 'jot note' button
-addNoteElement.addEventListener('click', () => {
-    noteEditorElement.style.display = 'block';
-});
 
-// listener for the 'Add realization to project' button in the realization editor
-noteEditorSubmitElement.addEventListener('click', () => {
-    if (noteEditorInterfaceElement.value === '') {
-        alert('Your axiom is empty; you cannot submit it.');
-        return;
-    }
-
-    saveNoteToProject(
-        noteEditorInterfaceElement.value,
-        noteEditorTitleElement.value
-    );
-
-    noteEditorElement.style.display = 'none';
-    clearNoteEditor(); // clear the fields
-
-    console.log("submitted note");
-});
 
 function verifySurveyFields() {
     let answers = [];
@@ -189,94 +149,23 @@ function verifySurveyFields() {
     return answers;
 }
 
-submitSurveyRetake.addEventListener('click', () => {
-    const answers = verifySurveyFields();
-    const confirmSubmission = confirm("Are you sure you want to submit?");
-
-    if (!confirmSubmission) {
-        return;
-    }
-
-    projectData.retook_survey = true;
-    projectData.post_survey_answers.push(answers);
-
-    console.log('survey retake submitted');
-
-    // hide the interface
-    retakeSurveyDivElement.style.display = 'none';
-    retakeSurveyAdditionalElements.forEach(element => {
-        element.style.display = 'none';
-    });
-    saveData();
-});
-
-// listener for the 'cancel' button in the realization editor
-noteEditorCancelElement.addEventListener('click', () => {
-    noteEditorElement.style.display = 'none';
-    clearNoteEditor(); // clear the data in the fields
-});
-
-// listener for the 'Develop an idea' button
-developIdeaElement.addEventListener('click', () => {
-    axiomEditorElement.style.display = 'block';
-});
-
-retakeSurveyElement.addEventListener('click', () => {
-    if (!ableToRetakeSurvey) {
-        return; // the button shouldn't even be visible if this is the case
-    }
-
-    if (projectData.retook_survey === true) {
-        alert("" +
-            "You've already retaken the survey. " +
-            "You can see your results somewhere. " +
-            "I don't know where, but somewhere."
-        );
-        return;
-    }
-
-    if (retakeSurveyDivElement.style.display === 'block') {
-        retakeSurveyDivElement.style.display = 'none';
-        // make this its own function
-        retakeSurveyAdditionalElements.forEach(element => {
-            element.style.display = 'none';
-        });
-    } else if (retakeSurveyDivElement.style.display === 'none') {
-        const confirmRetake = confirm("" +
-            "Are you sure you want to retake the survey? " +
-            "You can only retake this once; make sure you believe you are ready." +
-            " You can still review your pre-survey."
-        );
-        if (!confirmRetake) {
-            return;
-        }
-        retakeSurveyDivElement.style.display = 'block';
-        retakeSurveyAdditionalElements.forEach(element => {
-            element.style.display = 'block';
-        });
-        populateSurveyFields(config.survey); // should probably just call this once
-    }
-});
-
 // this is used to lookup the textareas for the submit logic.
-// this is quite sloppy but otherwise I'd need to essentially write a parser in this already monolithic file
+// this is quite sloppy, but otherwise I'd need to essentially write a parser in this already monolithic file
 let identifiersForLater = [];
 let populatedSurveyFields = false;
 
 function populateSurveyFields(surveyData) {
     if (populatedSurveyFields) {
-        console.log('aborted populateSurveyFields due to the fields already being populated.');
+        log('aborted populateSurveyFields due to the fields already being populated.');
         return;
     }
 
     if (surveyData == null) {
-        console.log('survey data is null');
+        log('survey data is null');
         return;
     }
 
-    const pairs = surveyData[0];
-
-    pairs.forEach(pair => {
+    surveyData.forEach(pair => {
         const question = pair[0];
         const identifier = `answer-${question}`;
         identifiersForLater.push(identifier);
@@ -287,87 +176,37 @@ function populateSurveyFields(surveyData) {
         <textarea id="${identifier}"></textarea> <br>
         `;
     });
-    console.log('survey fields populated');
+    log('survey fields populated');
     populatedSurveyFields = true;
-}
-
-
-
-function clearAxiomEditor() {
-    document.getElementById('axiom-editor-interface').value = '';
-    document.getElementById('axiom-editor-title').value = '';
 }
 
 // only works for yksi project mutta on fine for now.
 function saveData() {
     const data = JSON.stringify(projectData);
     localStorage.setItem('save_file', data);
-    console.log('saved data to localStorage');
+    log('saved data to localStorage');
 
-    console.log('data saved:');
-    console.log(data);
+    log('data saved:');
+    log(data);
 }
 
 function loadData() {
     const data = localStorage.getItem('save_file');
     if (data == null) {
-        void displayBadMessage('There is no data to load.');
-        console.log('no data found to load');
+        void displayMessage('There is no data to load.', 'bad');
+        log('no data found to load');
         return;
     }
     return JSON.parse(data);
     // this may need to be updated for survey stuff
 }
 
-// listener for the 'Add axiom to project' button in the axiom editor
-axiomEditorSubmitElement.addEventListener('click', () => {
-    if (document.getElementById('axiom-editor-interface').value === '') {
-        alert('Your axiom is empty; you cannot submit it.');
-        return;
-    }
-
-    saveAxiomToProject(
-        document.getElementById('axiom-editor-interface').value,
-        document.getElementById('axiom-editor-title').value
-    );
-
-    document.getElementById('axiom-editor').style.display = 'none';
-    clearAxiomEditor();
-});
-
-// listener for the 'cancel' button in the axiom editor
-axiomEditorCancelElement.addEventListener('click', () => {
-    axiomEditorElement.style.display = 'none';
-    clearAxiomEditor(); // clear the text fields
-});
-
-saveDataElement.addEventListener('click', () => {
-   saveData();
-});
-
-loadDataElement.addEventListener('click', () => {
-    console.log('load data button clicked');
-    restoreAxiomsAndNotes();
-});
-
-reviewPreSurveyElement.addEventListener('click', () => {
-    console.log('review pre survey button clicked');
-    if (preSurveyDivElement.style.display === 'block') {
-        preSurveyDivElement.style.display = 'none';
-        console.log('hidden pre survey div');
-    } else {
-        preSurveyDivElement.style.display = 'block';
-        console.log('displayed pre survey div');
-    }
-});
-
-
 function restoreAxiomsAndNotes() {
-    console.log('restoring axioms and notes');
+    log('restoring axioms and notes');
     const projectContent = loadData();
 
     if (projectContent == null) {
-        console.log('found nothing to restore');
+        log('found nothing to restore');
         return;
     }
 
@@ -380,17 +219,15 @@ function restoreAxiomsAndNotes() {
 }
 
 function restoreSurvey(surveyData) {
-    retakeSurveyElement.style.display = 'block';
+    display(retakeSurveyDivElement);
     ableToRetakeSurvey = true;
 
     if (surveyData == null) {
-        console.log('no survey data found to restore');
+        log('no survey data found to restore');
         return;
     }
 
-    const pairs = surveyData[0];
-
-    pairs.forEach(pair => {
+    surveyData.forEach(pair => {
         const question = pair[0];
         const answer   = pair[1];
         preSurveyDivElement.innerHTML += `
@@ -408,11 +245,7 @@ function restoreSurveyRetake(data) {
         return;
     }
     ableToRetakeSurvey = false;
-    retakeSurveyElement.style.display = 'none';
-    retakeSurveyDivElement.style.display = 'none';
-    retakeSurveyAdditionalElements.forEach(element => {
-        element.style.display = 'none';
-    });
+    hideSurveyElements();
 }
 
 // restore the mission statement and project title data
@@ -420,7 +253,7 @@ function populateWithData(config) {
     if (config == null) {
         // this page would be broken and (mostly) unusable otherwise.
         // consider adding a warning message like alert()
-        window.location.href = '../views/user_homepage.html';
+        window.location.href = "../views/user_homepage.html";
         return;
     }
 
@@ -432,7 +265,99 @@ function populateWithData(config) {
         restoreSurvey(config.survey);
         restoreSurveyRetake(loadData());
     } else {
-        console.log('no survey data found to restore');
+        log('no survey data found to restore');
+    }
+}
+
+function handleNoteEditorSubmit() {
+    if (noteEditorInterfaceElement.value === '') {
+        alert('Your axiom is empty; you cannot submit it.');
+        return;
+    }
+
+    saveNoteToProject(
+        noteEditorInterfaceElement.value,
+        noteEditorTitleElement.value
+    );
+
+    noteEditorElement.style.display = 'none';
+    hide(noteEditorElement);
+    clearNoteEditor(); // clear the fields
+
+    log("submitted note");
+}
+
+function handleSurveyRetakeSubmission() {
+    const answers = verifySurveyFields();
+    const confirmSubmission = confirm("Are you sure you want to submit?");
+
+    if (!confirmSubmission) {
+        return;
+    }
+
+    projectData.retook_survey = true;
+    projectData.post_survey_answers.push(answers);
+
+    log('survey retake submitted');
+
+    hideSurveyElements();
+    saveData();
+}
+
+function handleRetakeSurveyElementClick() {
+    if (!ableToRetakeSurvey) {
+        return; // the button shouldn't even be visible if this is the case
+    }
+
+    if (projectData.retook_survey === true) {
+        alert("" +
+            "You've already retaken the survey. " +
+            "You can see your results somewhere. " +
+            "I don't know where, but somewhere."
+        );
+        return;
+    }
+
+    if (retakeSurveyDivElement.style.display === 'block') {
+        hideSurveyElements();
+    } else if (retakeSurveyDivElement.style.display === 'none') {
+        const confirmRetake = confirm("" +
+            "Are you sure you want to retake the survey? " +
+            "You can only retake this once; make sure you believe you are ready." +
+            " You can still review your pre-survey."
+        );
+        if (!confirmRetake) {
+            return;
+        }
+        displaySurveyElements();
+
+        populateSurveyFields(config.survey); // should probably just call this once
+    }
+}
+
+function handleAxiomEditorSubmit() {
+    if (document.getElementById('axiom-editor-interface').value === '') {
+        alert('Your axiom is empty; you cannot submit it.');
+        return;
+    }
+
+    saveAxiomToProject(
+        document.getElementById('axiom-editor-interface').value,
+        document.getElementById('axiom-editor-title').value
+    );
+
+    document.getElementById('axiom-editor').style.display = 'none';
+    clearAxiomEditor();
+}
+
+function handlePreSurveyReview() {
+    log('review pre survey button clicked');
+    if (preSurveyDivElement.style.display === 'block') {
+        hide(preSurveyDivElement);
+        log('hid pre survey div');
+    } else {
+        display(preSurveyDivElement);
+        log('displayed pre survey div');
     }
 }
 
