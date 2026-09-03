@@ -4,8 +4,19 @@
     <meta charset="UTF-8">
     <title>Your homepage</title>
 
+    <link rel="icon" type="image/svg+xml" href="../assets/hamachi_favicon.svg">
+
     <style>
+        html {
+            font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+        }
         textarea {
+            font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+        }
+        input {
+            font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+        }
+        button {
             font-family: 'Trebuchet MS', AppleGothic, sans-serif;
         }
     </style>
@@ -78,18 +89,15 @@
     <button id="project-creation-cancel">Cancel</button>
 </div>
 
+<h2>Project:</h2>
+<hr>
 
-
-<div class="display-projects">
-    <h3>Your Projects:</h3>
-    <div class="no-projects" style="display: block">
-        <p>You don't have any projects to display. Start by creating one.</p>
-    </div>
-    <ul id="project-list">
-        <!--
-        Populated with JavaScript
-        -->
-    </ul>
+<div id="open-project">
+    <h3 id="project-name">
+        <!--Populated with JavaScript-->
+    </h3>
+    <button id="open-project-button">Pick up where you left off</button>
+    <button id="clear-project-button">Clear this project's data</button>
 </div>
 
 </body>

@@ -22,6 +22,10 @@ const surveyAnswer2                = document.getElementById('survey-answer-2');
 const surveyQuestion3              = document.getElementById('survey-question-3');
 const surveyAnswer3                = document.getElementById('survey-answer-3');
 
+const projectName                  = document.getElementById('project-name');
+const openProjectButton            = document.getElementById('open-project-button');
+const clearProjectButton           = document.getElementById('clear-project-button');
+
 let displayingSurveyFields = false;
 let displayingMoreSurveyInfo = false;
 
@@ -116,7 +120,6 @@ function submitProject() {
     projectCreatorElement.style.display = 'none';
 }
 
-
 createProjectButton.addEventListener('click', () => {
     projectCreatorElement.style.display = 'block';
 });
@@ -136,4 +139,21 @@ surveyCheckbox.addEventListener('change', () => {
 seeMoreInfoButton.addEventListener('click', () => {
     seeMoreInfo();
 });
+
+openProjectButton.addEventListener('click', () => {
+        window.location.href = './research_project.html';
+});
+
+clearProjectButton.addEventListener('click', () => {
+   if (confirm("Are you sure you want to clear the project? This cannot be reversed.")) {
+       localStorage.removeItem("save_file");
+       console.log('eradicated save file');
+   }
+})
+
+const data = localStorage.getItem('config');
+const name = JSON.parse(data).title;
+projectName.innerText = name;
+
+console.log(name);
 
