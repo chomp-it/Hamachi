@@ -1,107 +1,159 @@
-const createProjectButton = document.getElementById('create-project');
-const submitProjectFieldsButton = document.getElementById('project-submit');
+const createProjectButton         = document.getElementById('create-project');
+const submitProjectFieldsButton   = document.getElementById('project-submit');
+const cancelProjectCreationButton = document.getElementById('project-creation-cancel');
 
-let canSubmit = false;
+const projectTitleField           = document.getElementById('project-title');
+const projectGoalField            = document.getElementById('project-goal');
 
-// returns a dictionary of creation data; a key value field of the field name and the entry
+const surveyCheckbox              = document.getElementById('project-survey-checkbox');
+const surveyFields                = document.getElementById('create-project-survey');
+const surveyInfo                  = document.getElementById('survey-info');
+const seeMoreInfoButton           = document.getElementById('more-project-survey-info');
+
+const projectCreatorElement            = document.querySelector('.project-creation');
+
+// this is definitely not the best way to do this
+const surveyQuestion1              = document.getElementById('survey-question-1');
+const surveyAnswer1                = document.getElementById('survey-answer-1');
+
+const surveyQuestion2              = document.getElementById('survey-question-2');
+const surveyAnswer2                = document.getElementById('survey-answer-2');
+
+const surveyQuestion3              = document.getElementById('survey-question-3');
+const surveyAnswer3                = document.getElementById('survey-answer-3');
+
+const projectName                  = document.getElementById('project-name');
+const openProjectButton            = document.getElementById('open-project-button');
+const clearProjectButton           = document.getElementById('clear-project-button');
+
+let displayingSurveyFields = false;
+let displayingMoreSurveyInfo = false;
+
+// this may need fixing
+function getFilledSurveyFields() {
+    let filledFields = [];
+    // find fields that have both a question and an answer
+    for (let i = 1; i <= 3; i++) {
+        const question = document.getElementById(`survey-question-${i}`);
+        const answer = document.getElementById(`survey-answer-${i}`);
+        if (question.value !== '' && answer.value !== '') {
+            filledFields.push([question.value, answer.value]);
+        }
+    }
+    console.log('filled fields:');
+    console.log(filledFields);
+    return filledFields;
+}
+
 function getAllCreationData() {
-    const projectTitleField = document.getElementById('project-title');
-    const projectGoalField = document.getElementById('project-goal');
     return {
         title: projectTitleField.value,
-        goal: projectGoalField.value
+        goal: projectGoalField.value,
+        survey: getFilledSurveyFields()
     };
 }
 
-function verifyGivenData(givenData) {
-    if (givenData.title === '' || givenData.goal === '') {
-        alert('One or more fields are empty; please fill them out.');
+// needs refactoring eventually
+function verifySurveyFields() {
+    if (surveyQuestion1.value === '' || surveyAnswer1.value === '') {
+        alert("You must at least fill out and answer the first question.");
         return false;
     }
-    if (givenData.title.length > 20) {
-        alert('Your project title is too long; please shorten it.');
+    if (surveyQuestion2.value === '' && surveyAnswer2.value !== '' || surveyQuestion2.value !== '' && surveyAnswer2.value === '') {
+        alert("You only partially filled out the second question. Either answer it fully or leave it blank.");
         return false;
     }
-    if (givenData.goal.length > 150) {
-        alert('Your project goal is too long; please shorten it.');
+    if (surveyQuestion3.value === '' && surveyAnswer3.value !== '' || surveyQuestion3.value !== '' && surveyAnswer3.value === '') {
+        alert("You only partially filled out the third question. Either answer it fully or leave it blank.");
         return false;
     }
-    return givenData;
+    return true;
 }
 
-const organizeCreationData = (givenData) => { return JSON.stringify(givenData) }
+function verifyGivenData(givenData) {
+    if (givenData.title === '') {
+        alert('You must fill out the title.');
+        return false;
+    }
+    if (givenData.goal === '') {
+        alert('You need to fill out the mission statement');
+        return false;
+    }
+    if (displayingSurveyFields) {
+        if (!verifySurveyFields()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function seeMoreInfo() {
+    if (displayingMoreSurveyInfo) {
+        surveyInfo.style.display = 'none';
+        displayingMoreSurveyInfo = false;
+        return;
+    }
+    surveyInfo.style.display = 'block';
+    displayingMoreSurveyInfo = true;
+}
+
+function surveyCheckboxClicked() {
+    if (displayingSurveyFields) {
+        surveyFields.style.display = 'none';
+        displayingSurveyFields = false
+        return;
+    }
+    surveyFields.style.display = 'block';
+    displayingSurveyFields = true;
+}
 
 function createProject(withData) {
-    let thisProjectName = `${withData.title}_creation_data`;
-    localStorage.setItem('current_project', withData.title);
-
-    const organizedData = organizeCreationData(withData);
-
-    localStorage.setItem(thisProjectName, organizedData);
-
-    console.log('deposited data in localStorage:')
-    console.log(organizedData);
-
+    localStorage.setItem('config', JSON.stringify(withData));
     window.location.href = '../views/research_project.html';
 }
 
-createProjectButton.addEventListener('click', () => {
-    const projectCreatorElement = document.querySelector('.project-creation');
-    projectCreatorElement.style.display = 'block';
-    canSubmit = true;
-});
-
-
-submitProjectFieldsButton.addEventListener('click', () => {
-    if (canSubmit === false) {
-        alert('You cannot submit a project without filling out the fields. How did you even get here?');
-        return;
-    }
-
+function submitProject() {
     const allCreationData = getAllCreationData();
     if (verifyGivenData(allCreationData)) {
         createProject(allCreationData);
     }
-
-    const hasSpecialCharacters = (title) => {return /[a-zA-Z]/.test(title)}
-
-    if (hasSpecialCharacters(allCreationData.title)) {
-        alert('Your project title contains special characters; please remove them.');
-        return;
-    }
-
-    const projectCreatorElement = document.querySelector('.project-creation');
     projectCreatorElement.style.display = 'none';
+}
 
-    canSubmit = false;
-
-    console.log('created project');
+createProjectButton.addEventListener('click', () => {
+    projectCreatorElement.style.display = 'block';
 });
 
+cancelProjectCreationButton.addEventListener('click', () => {
+    projectCreatorElement.style.display = 'none';
+});
 
+submitProjectFieldsButton.addEventListener('click', () => {
+    submitProject();
+});
 
-// populating homepage with projects
-function populateProjectsList() {
-    const projectsListElement = document.getElementById('projects-list');
-    const globalJson = localStorage.getItem('current_project');
-    if (globalJson === null) {
-        console.log('Failed to locate the current_project file in localStorage.');
-        return;
-    }
+surveyCheckbox.addEventListener('change', () => {
+    surveyCheckboxClicked();
+});
 
-    let parsedJson = JSON.parse(globalJson);
-    let projectsList = parsedJson.projects;
-    if (projectsList !== null && projectsList !== undefined) {
-        const noProjectsElement = document.getElementById('no-projects');
-        noProjectsElement.style.display = 'none';
-    }
+seeMoreInfoButton.addEventListener('click', () => {
+    seeMoreInfo();
+});
 
-    projectsList.forEach(project => {
-        projectsListElement.innerHTML += `
-   <li>
-   <p>Project name: ${project.name}</p>
-   <p>Project goal: ${project.goal}</p>
-   </li>`;
-    });
-}
+openProjectButton.addEventListener('click', () => {
+        window.location.href = './research_project.html';
+});
+
+clearProjectButton.addEventListener('click', () => {
+   if (confirm("Are you sure you want to clear the project? This cannot be reversed.")) {
+       localStorage.removeItem("save_file");
+       console.log('eradicated save file');
+   }
+})
+
+const data = localStorage.getItem('config');
+const name = JSON.parse(data).title;
+projectName.innerText = name;
+
+console.log(name);
 

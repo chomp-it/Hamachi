@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Your research project</title>
 
-    <link rel="favicon" type="image/svg+xml" href="../assets/hamachi_favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="../assets/hamachi_favicon.svg">
     <link rel="stylesheet" href="../stylesheets/research_project.css">
 </head>
 <body>
@@ -39,11 +39,13 @@
     <hr>
 </div>
 
-<!--
-I'm not a designer; I'm a programmer. I'm not going to design a loading spinner
--->
 <div class="loading-screen" style="display: block;">
     <p id="loading-screen-message" style="color: #038c03"></p>
+</div>
+
+<div>
+    <!--The same red tone as Ruby on Rails!-->
+    <p id="bad-message-content" style="color: #D30001"></p>
 </div>
 
 <div class="editors">
@@ -79,17 +81,35 @@ I'm not a designer; I'm a programmer. I'm not going to design a loading spinner
     <button id="develop-idea">Develop an idea</button>
     <button id="save-project">Save data</button>
     <button id="load-data">Load data</button>
+    <button id="retake-survey-button">Retake survey</button>
+    <button id="review-pre-survey">See your answers to the pre-survey</button>
+    <button id="review-post-survey" style="display: none">See your answers to the post-survey</button>
+    <hr>
 </div>
 
 <div id="publish-findings-menu" style="display: none">
     <p>How do you wanna go about this?</p>
+    <!--work in progress-->
 </div>
 
-<div id="more-options-menu" style="display: none">
-
+<div id="pre-survey-div" style="display: none">
+    <p>Your answers to the pre-survey:</p>
+    <!--Populated with JavaScript-->
 </div>
 
+<p class="retake-survey-additionals" style="display: none">Retake the survey:</p>
+<div id="retake-survey-div" style="display: none">
+    <!--Populated with JavaScript-->
+</div>
+<button class="retake-survey-additionals" id="submit-survey-retake" style="display: none">Submit</button>
+
+<div id="review-post-survey-div" style="display: none">
+    <!--Populated with JavaScript-->
+</div>
+
+<script src="../javascripts/research_project_helpers.js"></script>
 <script src="../javascripts/research_project_controller.js"></script>
+<script src="../javascripts/research_project_listeners.js"></script>
 </body>
 
 </html>

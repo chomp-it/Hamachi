@@ -3,6 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>Your homepage</title>
+
+    <link rel="icon" type="image/svg+xml" href="../assets/hamachi_favicon.svg">
+
+    <style>
+        html {
+            font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+        }
+        textarea {
+            font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+        }
+        input {
+            font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+        }
+        button {
+            font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+        }
+    </style>
 </head>
 <body>
 
@@ -11,14 +28,12 @@
     <button id="create-project">Create</button>
 </div>
 
-<!--
-Later add a checkbox to make it a group research project.
-Let's actually hold off on that until the group features are more mature.
--->
+
+
 <div class="project-creation" style="display: none">
     <h3>Create a new research project</h3>
 
-    <label for="project-title">Title this project</label> <br>
+    <label for="project-title">Title this project:</label> <br>
     <input type="text" id="project-title" required> <br>
 
     <label for="project-goal">
@@ -27,22 +42,62 @@ Let's actually hold off on that until the group features are more mature.
     </label> <br>
     <textarea id="project-goal" rows="4" cols="50" required></textarea> <br>
 
+    <label for="project-survey-checkbox">
+        Would you like to set up a survey for your future self?
+        <button id="more-project-survey-info">More info</button>
+    </label> <br>
+
+    <div id="survey-info" style="display: none">
+        <p>
+            Think of a survey like a pre-test before you start a class. <br>
+            You answer questions to the best of your ability, <br>
+            and after you are done with your research you retake the same survey <br>
+            and you can see how your knowledge and ideas changed.
+        </p>
+    </div>
+
+    <input type="checkbox" id="project-survey-checkbox"> <br>
+
+    <div id="create-project-survey" style="display: none">
+        <p>(Leave the field blank if you don't want that many questions)</p>
+
+        <label for="survey-question-1">Q1.</label> <br>
+        <input type="text" id="survey-question-1"> <br>
+
+        <label for="survey-answer-1">A1.</label> <br>
+        <input type="text" id="survey-answer-1"> <br>
+        <br>
+        <!--Question 2-->
+        <label for="survey-question-2">Q2.</label> <br>
+        <input type="text" id="survey-question-2"> <br>
+
+        <label for="survey-answer-2">A2.</label> <br>
+        <input type="text" id="survey-answer-2"> <br>
+        <br>
+        <!--Question 3-->
+        <label for="survey-question-3">Q3.</label> <br>
+        <input type="text" id="survey-question-3"> <br>
+
+        <label for="survey-answer-3">A3.</label> <br>
+        <input type="text" id="survey-answer-3"> <br>
+        <br>
+    </div>
+
     <label for="project-submit">Create project</label> <br>
     <input type="submit" id="project-submit"> <br>
 
     <button id="project-creation-cancel">Cancel</button>
 </div>
 
-<div class="display-projects">
-    <h3>Your Projects:</h3>
-    <div class="no-projects" style="display: block">
-        <p>You don't have any projects to display. Start by creating one.</p>
-    </div>
-    <ul id="project-list">
-        <!--
-        Populated with JavaScript
-        -->
-    </ul>
+<h2>Project:</h2>
+<hr>
+
+<div id="open-project">
+    <h3 id="project-name">
+        <!--Populated with JavaScript-->
+    </h3>
+    <button id="open-project-button">Pick up where you left off</button>
+    <button id="clear-project-button">Clear this project's data</button>
 </div>
 
 </body>
