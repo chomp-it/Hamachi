@@ -26,8 +26,22 @@ const projectName                  = document.getElementById('project-name');
 const openProjectButton            = document.getElementById('open-project-button');
 const clearProjectButton           = document.getElementById('clear-project-button');
 
+const noActiveProjectMessage       = document.getElementById('no-current-project');
+
+const warningMessage = "You already have a project. " +
+    "Creating a new one would mean deleting the other one. " +
+    "Are you sure about this?";
+
 let displayingSurveyFields = false;
 let displayingMoreSurveyInfo = false;
+
+function hide(element) {
+    element.style.display = 'none';
+}
+
+function display(element) {
+    element.style.display = 'block';
+}
 
 // this may need fixing
 function getFilledSurveyFields() {
@@ -108,8 +122,17 @@ function surveyCheckboxClicked() {
 }
 
 function createProject(withData) {
-    localStorage.setItem('config', JSON.stringify(withData));
-    window.location.href = '../views/research_project.html';
+    const checkForExistingProject = localStorage.getItem("save_file");
+    if (checkForExistingProject != null) {
+        if (confirm(warningMessage)) {
+            localStorage.clear()
+            localStorage.setItem('config', JSON.stringify(withData));
+            window.location.href = '../views/research_project.html';
+        }
+    } else {
+        localStorage.setItem('config', JSON.stringify(withData));
+        window.location.href = '../views/research_project.html';
+    }
 }
 
 function submitProject() {
@@ -118,6 +141,16 @@ function submitProject() {
         createProject(allCreationData);
     }
     projectCreatorElement.style.display = 'none';
+}
+
+function resumeWork() {
+    if (localStorage.getItem('config') == null) {
+        alert('There is no project to resume.');
+        return;
+    }
+    window.location.href = './research_project.html';
+    const data = localStorage.getItem('config');
+    projectName.innerText = JSON.parse(data).title;
 }
 
 createProjectButton.addEventListener('click', () => {
@@ -141,19 +174,30 @@ seeMoreInfoButton.addEventListener('click', () => {
 });
 
 openProjectButton.addEventListener('click', () => {
-        window.location.href = './research_project.html';
+        resumeWork();
 });
 
 clearProjectButton.addEventListener('click', () => {
    if (confirm("Are you sure you want to clear the project? This cannot be reversed.")) {
-       localStorage.removeItem("save_file");
+       localStorage.clear();
        console.log('eradicated save file');
+       hide(projectName);
+       hide(openProjectButton);
+       hide(clearProjectButton);
+       display(noActiveProjectMessage);
    }
-})
+});
 
-const data = localStorage.getItem('config');
-const name = JSON.parse(data).title;
-projectName.innerText = name;
+const projectTitle = JSON.parse(localStorage.getItem('config'));
 
-console.log(name);
+if (projectTitle == null) {
+    hide(projectName);
+    hide(openProjectButton);
+    hide(clearProjectButton);
+    display(noActiveProjectMessage);
+} else {
+    projectName.innerText = projectTitle.title;
+    hide(noActiveProjectMessage);
+}
+
 

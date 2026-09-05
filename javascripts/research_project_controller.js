@@ -197,7 +197,6 @@ function saveData() {
 function loadData() {
     const data = JSON.parse(localStorage.getItem('save_file'));
     if (data == null) {
-        void displayMessage('There is no data to load.', 'bad');
         log('no data found to load');
         return;
     }
@@ -416,5 +415,10 @@ const config = JSON.parse(localStorage.getItem('config'));
 projectData.survey_questions = config.survey;
 populateWithData(config);
 
+if (config.survey.length === 0) {
+    hide(retakeSurveyElement);
+    hide(reviewPreSurveyElement);
+    hide(reviewPostSurveyElement);
+}
 
 
