@@ -1,0 +1,29 @@
+html {
+    background-color: #535e97;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body {
+    color: #f4e9ff
+}
+
+textarea {
+    border: 1px solid #1d0b32
+}
+
+input {
+    border: 1px solid #1d0b32
+}
+
+button {
+    border: 1px solid #1d0b32
+}
+
+.assign-background-box {
+    background-color: #1d0b32;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}

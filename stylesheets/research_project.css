@@ -1,5 +1,7 @@
 body {
     font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+    color: #f4e9ff
+
 }
 
 input {
@@ -8,4 +10,12 @@ input {
 
 textarea {
     font-family: 'Trebuchet MS', AppleGothic, sans-serif;
+}
+
+html {
+    background-color: #535e97;
+}
+
+hr {
+    color: #4e3367;
 }

@@ -5,6 +5,7 @@
     <title>Your homepage</title>
 
     <link rel="icon" type="image/svg+xml" href="../assets/hamachi_favicon.svg">
+    <link rel="stylesheet" href="../stylesheets/user_homepage.css">
 
     <style>
         html {
@@ -89,20 +90,26 @@
     <button id="project-creation-cancel">Cancel</button>
 </div>
 
-<h2>Project:</h2>
-<hr>
 
-<p id="no-current-project" style="display: none">
-    You don't have an active project right now
-</p>
+<br>
+<div id="project-container">
+    <h2 class="assign-background-box">Project:</h2>
 
-<div id="open-project">
-    <h3 id="project-name">
-        <!--Populated with JavaScript-->
-    </h3>
-    <button id="open-project-button">Pick up where you left off</button>
-    <button id="clear-project-button">Clear this project's data</button>
+
+    <p id="no-current-project" style="display: none">
+        You don't have an active project right now. <br>
+        When you create one, it'll show up here.
+    </p>
+
+    <div id="open-project">
+        <h3 id="project-name">
+            <!--Populated with JavaScript-->
+        </h3>
+        <button id="open-project-button">Pick up where you left off</button>
+        <button id="clear-project-button">Clear this project's data</button>
+    </div>
 </div>
+
 
 </body>
 <script src="../javascripts/user_homepage_controller.js"></script>
